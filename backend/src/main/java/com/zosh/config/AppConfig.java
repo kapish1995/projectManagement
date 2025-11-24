@@ -23,27 +23,36 @@ import jakarta.servlet.http.HttpServletRequest;
 public class AppConfig {
 	
 	@Bean
-	SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
-		http.sessionManagement(Management -> Management.sessionCreationPolicy(
-				SessionCreationPolicy.STATELESS))
-		.authorizeHttpRequests(Authorize -> Authorize.requestMatchers("/api/admin/**").hasRole("ADMIN")
-				.requestMatchers("/api/**")
-				.authenticated().anyRequest().permitAll())
-		.addFilterBefore(new JwtTokenValidator(),BasicAuthenticationFilter.class)
+	SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+
+		http.sessionManagement(m -> m.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+		.authorizeHttpRequests(auth -> auth
+
+				//  Allow public login/signup (VERY IMPORTANT)
+				.requestMatchers("/auth/**").permitAll()
+
+				//  Admin routes
+				.requestMatchers("/api/admin/**").hasRole("ADMIN")
+
+				//  Authenticated APIs
+				.requestMatchers("/api/**").authenticated()
+
+				.anyRequest().permitAll()
+		)
+		.addFilterBefore(new JwtTokenValidator(), BasicAuthenticationFilter.class)
 		.csrf(csrf -> csrf.disable())
 		.cors(cors -> cors.configurationSource(corsConfigurationSource()));
-		
+
 		return http.build();
 	}
 
 	private CorsConfigurationSource corsConfigurationSource() {
-		// TODO Auto-generated method stub
+
 		return new CorsConfigurationSource() {
-			
+
 			@Override
-			public CorsConfiguration getCorsConfiguration(
-					HttpServletRequest request) {
-				// TODO Auto-generated method stub
+			public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
+
 				CorsConfiguration cfg = new CorsConfiguration();
 
 				cfg.setAllowedOrigins(Arrays.asList(
@@ -53,6 +62,7 @@ public class AppConfig {
 						"https://project-management-brown-delta.vercel.app"
 				));
 
+				// Tumhara OLD commented code — same as it is
 				// cfg.setAllowedMethods(Collections.singletonList("*"));
 				// cfg.setAllowCredentials(true);
 				// cfg.setAllowedHeaders(Collections.singletonList("*"));
@@ -60,6 +70,7 @@ public class AppConfig {
 				// cfg.setMaxAge(3600L);
 				// return cfg;
 
+				// Final working CORS config
 				cfg.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
 				cfg.setAllowedHeaders(Arrays.asList("*"));
 				cfg.setExposedHeaders(Arrays.asList("Authorization"));
@@ -69,9 +80,9 @@ public class AppConfig {
 			}
 		};
 	}
-	
+
 	@Bean
 	PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
-	} 
+	}
 }
