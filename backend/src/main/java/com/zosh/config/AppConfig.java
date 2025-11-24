@@ -50,7 +50,7 @@ public class AppConfig {
 						"http://localhost:3000",
 						"http://localhost:5173",
 						"http://localhost:5174",
-						"https://project-management-react-plum.vercel.app"
+						"https://project-management-brown-delta.vercel.app"
 				));
 
 				cfg.setAllowedMethods(Collections.singletonList("*"));
