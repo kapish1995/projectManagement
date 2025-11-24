@@ -59,12 +59,13 @@ public class AppConfig {
 				// cfg.setExposedHeaders(Arrays.asList("Authorization"));
 				// cfg.setMaxAge(3600L);
 				// return cfg;
-				 cfg.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        cfg.setAllowedHeaders(Arrays.asList("*"));
-        cfg.setExposedHeaders(Arrays.asList("Authorization"));
-        cfg.setAllowCredentials(true);
 
-        return cfg;
+				cfg.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+				cfg.setAllowedHeaders(Arrays.asList("*"));
+				cfg.setExposedHeaders(Arrays.asList("Authorization"));
+				cfg.setAllowCredentials(true);
+
+				return cfg;
 			}
 		};
 	}
@@ -73,6 +74,4 @@ public class AppConfig {
 	PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
 	} 
-
-
 }
