@@ -53,7 +53,7 @@ public class AppConfig {
                         "http://localhost:3000",
                         "http://localhost:5173",
                         "http://localhost:5174",
-                        "https://project-management-brown-delta.vercel.app"
+                        "https://project-management-uwf1.vercel.app"
                 ));
 
                 // tumhara commented code — same
