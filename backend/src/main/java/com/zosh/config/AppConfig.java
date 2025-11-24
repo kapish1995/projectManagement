@@ -1,88 +1,32 @@
-package com.zosh.config;
+private CorsConfigurationSource corsConfigurationSource() {
 
-import java.util.Arrays;
-import java.util.Collections;
+    CorsConfiguration cfg = new CorsConfiguration();
 
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
+    cfg.setAllowedOrigins(Arrays.asList(
+            "http://localhost:3000",
+            "http://localhost:5173",
+            "http://localhost:5174",
+            "https://project-management-brown-delta.vercel.app"
+    ));
 
-import jakarta.servlet.http.HttpServletRequest;
+    // Tumhara commented code jaisa ka taisa
+    // cfg.setAllowedMethods(Collections.singletonList("*"));
+    // cfg.setAllowCredentials(true);
+    // cfg.setAllowedHeaders(Collections.singletonList("*"));
+    // cfg.setExposedHeaders(Arrays.asList("Authorization"));
+    // cfg.setMaxAge(3600L);
+    // return cfg;
 
-@Configuration
-@EnableWebSecurity
-public class AppConfig {
-	
-	@Bean
-	SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    cfg.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+    cfg.setAllowedHeaders(Arrays.asList("*"));
+    cfg.setExposedHeaders(Arrays.asList("Authorization"));
+    cfg.setAllowCredentials(true);
 
-		http.sessionManagement(m -> m.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-		.authorizeHttpRequests(auth -> auth
+    // *** MAJOR FIX ***
+    org.springframework.web.cors.UrlBasedCorsConfigurationSource source =
+            new org.springframework.web.cors.UrlBasedCorsConfigurationSource();
 
-				//  Allow public login/signup (VERY IMPORTANT)
-				.requestMatchers("/auth/**").permitAll()
+    source.registerCorsConfiguration("/**", cfg);
 
-				//  Admin routes
-				.requestMatchers("/api/admin/**").hasRole("ADMIN")
-
-				//  Authenticated APIs
-				.requestMatchers("/api/**").authenticated()
-
-				.anyRequest().permitAll()
-		)
-		.addFilterBefore(new JwtTokenValidator(), BasicAuthenticationFilter.class)
-		.csrf(csrf -> csrf.disable())
-		.cors(cors -> cors.configurationSource(corsConfigurationSource()));
-
-		return http.build();
-	}
-
-	private CorsConfigurationSource corsConfigurationSource() {
-
-		return new CorsConfigurationSource() {
-
-			@Override
-			public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
-
-				CorsConfiguration cfg = new CorsConfiguration();
-
-				cfg.setAllowedOrigins(Arrays.asList(
-						"http://localhost:3000",
-						"http://localhost:5173",
-						"http://localhost:5174",
-						"https://project-management-brown-delta.vercel.app"
-				));
-
-				// Tumhara OLD commented code — same as it is
-				// cfg.setAllowedMethods(Collections.singletonList("*"));
-				// cfg.setAllowCredentials(true);
-				// cfg.setAllowedHeaders(Collections.singletonList("*"));
-				// cfg.setExposedHeaders(Arrays.asList("Authorization"));
-				// cfg.setMaxAge(3600L);
-				// return cfg;
-
-				// Final working CORS config
-				cfg.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-				cfg.setAllowedHeaders(Arrays.asList("*"));
-				cfg.setExposedHeaders(Arrays.asList("Authorization"));
-				cfg.setAllowCredentials(true);
-
-				return cfg;
-			}
-		};
-	}
-
-	@Bean
-	PasswordEncoder passwordEncoder() {
-		return new BCryptPasswordEncoder();
-	}
+    return source;
 }
